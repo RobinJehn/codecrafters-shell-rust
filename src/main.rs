@@ -60,6 +60,9 @@ fn main() {
                         break;
                     }
                 }
+                if found {
+                    break;
+                }
             }
             if !found {
                 println!("{}: not found", type_cmd);
