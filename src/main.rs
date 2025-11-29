@@ -1,6 +1,52 @@
 #[allow(unused_imports)]
 use std::io::{self, Write};
-use std::{collections::HashSet, env, ffi::OsStr, fs, os::unix::fs::PermissionsExt};
+use std::{
+    collections::HashSet,
+    env,
+    ffi::OsStr,
+    fs,
+    os::unix::fs::PermissionsExt,
+    path::{Path, PathBuf},
+};
+
+fn find_exec(cmd: &str) -> Option<PathBuf> {
+    let path = env::var("PATH").unwrap_or_default();
+    for dir in env::split_paths(&path) {
+        let dir_cont = match fs::read_dir(dir) {
+            Ok(value) => value,
+            Err(_) => continue,
+        };
+
+        for entry in dir_cont {
+            let entry = match entry {
+                Ok(value) => value,
+                Err(_) => continue,
+            };
+
+            let meta = match entry.metadata() {
+                Ok(value) => value,
+                Err(_) => continue,
+            };
+
+            if !meta.is_file() {
+                continue;
+            }
+
+            let permissions = meta.permissions();
+            let mode = permissions.mode();
+            let executable = mode & 0o111;
+            if executable == 0 {
+                continue;
+            }
+
+            if entry.file_name() == OsStr::new(cmd) {
+                let file_path = entry.path();
+                return Some(file_path);
+            }
+        }
+    }
+    return None;
+}
 
 fn main() {
     while true {
@@ -22,50 +68,9 @@ fn main() {
                 continue;
             }
 
-            // Search through every dir in PATH if an executable file with the name type_cmd exists
-            let mut found = false;
-            let path = env::var("PATH").unwrap_or_default();
-            for dir in env::split_paths(&path) {
-                let dir_cont = match fs::read_dir(dir) {
-                    Ok(value) => value,
-                    Err(_) => continue,
-                };
-
-                for entry in dir_cont {
-                    let entry = match entry {
-                        Ok(value) => value,
-                        Err(_) => continue,
-                    };
-
-                    let meta = match entry.metadata() {
-                        Ok(value) => value,
-                        Err(_) => continue,
-                    };
-
-                    if !meta.is_file() {
-                        continue;
-                    }
-
-                    let permissions = meta.permissions();
-                    let mode = permissions.mode();
-                    let executable = mode & 0o111;
-                    if executable == 0 {
-                        continue;
-                    }
-
-                    if entry.file_name() == OsStr::new(type_cmd) {
-                        let file_path = entry.path();
-                        println!("{} is {}", type_cmd, file_path.to_str().unwrap());
-                        found = true;
-                        break;
-                    }
-                }
-                if found {
-                    break;
-                }
-            }
-            if !found {
-                println!("{}: not found", type_cmd);
+            match find_exec(type_cmd) {
+                Some(path) => println!("{} is {}", type_cmd, path.display()),
+                None => println!("{}: not found", type_cmd),
             }
         } else {
             println!("{}: command not found", command);
