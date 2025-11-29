@@ -20,7 +20,7 @@ fn main() {
             if set.contains(type_cmd) {
                 println!("{} is a shell builtin", type_cmd);
             } else {
-                println!("{}: command not found", type_cmd);
+                println!("{}: not found", type_cmd);
             }
         } else {
             println!("{}: command not found", command);
