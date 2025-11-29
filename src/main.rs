@@ -87,7 +87,7 @@ fn main() {
                         .output()
                         .expect("Failed to run");
 
-                    println!("{}", String::from_utf8_lossy(&output.stdout));
+                    print!("{}", String::from_utf8_lossy(&output.stdout));
                 }
                 None => println!("{}: command not found", command),
             }
