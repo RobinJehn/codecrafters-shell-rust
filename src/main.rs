@@ -7,6 +7,7 @@ use std::{
     fs,
     os::unix::fs::PermissionsExt,
     path::{Path, PathBuf},
+    process::Command,
 };
 
 fn find_exec(cmd: &str) -> Option<PathBuf> {
@@ -73,7 +74,23 @@ fn main() {
                 None => println!("{}: not found", type_cmd),
             }
         } else {
-            println!("{}: command not found", command);
+            let args: Vec<&str> = command.split_whitespace().collect();
+
+            if args.is_empty() {
+                println!("{}: command not found", command);
+            }
+
+            match find_exec(args[0]) {
+                Some(_) => {
+                    let output = Command::new(args[0])
+                        .args(&args[1..])
+                        .output()
+                        .expect("Failed to run");
+
+                    println!("{}", String::from_utf8_lossy(&output.stdout));
+                }
+                None => println!("{}: command not found", command),
+            }
         }
     }
 }
