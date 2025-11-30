@@ -49,7 +49,7 @@ fn find_exec(cmd: &str) -> Option<PathBuf> {
     return None;
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq, Eq)]
 enum ParseState {
     InsideDoubleQuote,
     InsideSingleQuote,
@@ -80,6 +80,9 @@ fn parse_input(input: &str) -> Vec<String> {
                     state = prev_esc_char_state;
                 }
                 _ => {
+                    if state != ParseState::Outside {
+                        token.push('\\');
+                    }
                     prev_esc_char_state = state;
                     state = ParseState::AfterEscapeChar;
                 }
@@ -110,7 +113,6 @@ fn parse_input(input: &str) -> Vec<String> {
             },
             _ => match state {
                 ParseState::AfterEscapeChar => {
-                    // token.push('\\');
                     token.push(c);
                     state = prev_esc_char_state;
                 }
