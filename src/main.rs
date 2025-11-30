@@ -69,6 +69,9 @@ fn parse_input(input: &str) -> Vec<String> {
                 ParseState::InsideSingleQuote => state = ParseState::Outside,
                 ParseState::Outside => state = ParseState::InsideSingleQuote,
                 ParseState::AfterEscapeChar => {
+                    if prev_esc_char_state != ParseState::InsideDoubleQuote {
+                        token.push('\\');
+                    }
                     state = prev_esc_char_state;
                     token.push(c);
                 }
@@ -76,6 +79,9 @@ fn parse_input(input: &str) -> Vec<String> {
             },
             '\\' => match state {
                 ParseState::AfterEscapeChar => {
+                    if prev_esc_char_state != ParseState::InsideDoubleQuote {
+                        token.push('\\');
+                    }
                     token.push(c);
                     state = prev_esc_char_state;
                 }
@@ -86,6 +92,9 @@ fn parse_input(input: &str) -> Vec<String> {
             },
             '\"' => match state {
                 ParseState::AfterEscapeChar => {
+                    if prev_esc_char_state != ParseState::InsideDoubleQuote {
+                        token.push('\\');
+                    }
                     state = prev_esc_char_state;
                     token.push(c);
                 }
@@ -95,6 +104,9 @@ fn parse_input(input: &str) -> Vec<String> {
             },
             ' ' => match state {
                 ParseState::AfterEscapeChar => {
+                    if prev_esc_char_state != ParseState::InsideDoubleQuote {
+                        token.push('\\');
+                    }
                     state = prev_esc_char_state;
                     token.push(c);
                 }
