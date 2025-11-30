@@ -67,7 +67,9 @@ fn main() {
         } else if let Some(echo) = command.strip_prefix("echo ") {
             println!("{}", echo);
         } else if let Some(dir) = command.strip_prefix("cd ") {
-            match env::set_current_dir(dir) {
+            let home = env::var("HOME").unwrap_or_default();
+            let dir = dir.replace("~", &home);
+            match env::set_current_dir(&dir) {
                 Ok(_) => {}
                 Err(_) => println!("cd: {}: No such file or directory", dir),
             }
