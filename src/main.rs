@@ -58,7 +58,7 @@ fn main() {
         command = command.trim_end().to_string();
 
         // Handle commands
-        let set = HashSet::from(["exit", "type", "echo", "pwd"]);
+        let set = HashSet::from(["exit", "type", "echo", "pwd", "cd"]);
         if command == "exit" {
             return;
         } else if command == "pwd" {
@@ -66,6 +66,11 @@ fn main() {
             println!("{}", cwd.display());
         } else if let Some(echo) = command.strip_prefix("echo ") {
             println!("{}", echo);
+        } else if let Some(dir) = command.strip_prefix("cd ") {
+            match env::set_current_dir(dir) {
+                Ok(_) => {}
+                Err(_) => println!("cd: {}: No such file or directory", dir),
+            }
         } else if let Some(type_cmd) = command.strip_prefix("type ") {
             if set.contains(type_cmd) {
                 println!("{} is a shell builtin", type_cmd);
