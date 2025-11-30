@@ -80,9 +80,6 @@ fn parse_input(input: &str) -> Vec<String> {
                     state = prev_esc_char_state;
                 }
                 _ => {
-                    if state != ParseState::Outside {
-                        token.push('\\');
-                    }
                     prev_esc_char_state = state;
                     state = ParseState::AfterEscapeChar;
                 }
@@ -113,6 +110,9 @@ fn parse_input(input: &str) -> Vec<String> {
             },
             _ => match state {
                 ParseState::AfterEscapeChar => {
+                    if state != ParseState::Outside && !['$', 'n'].contains(&c) {
+                        token.push('\\');
+                    }
                     token.push(c);
                     state = prev_esc_char_state;
                 }
