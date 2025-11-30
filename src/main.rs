@@ -138,7 +138,7 @@ fn main() {
             let cwd = env::current_dir().unwrap();
             println!("{}", cwd.display());
         } else if cmd == "echo" {
-            println!("{}", tokens[1]);
+            println!("{}", tokens[1..].join(" "));
         } else if cmd == "cd" {
             let home = env::var("HOME").unwrap_or_default();
             let dir = tokens[1].replace("~", &home);
