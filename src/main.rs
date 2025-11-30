@@ -58,9 +58,12 @@ fn main() {
         command = command.trim_end().to_string();
 
         // Handle commands
-        let set = HashSet::from(["exit", "type", "echo"]);
+        let set = HashSet::from(["exit", "type", "echo", "pwd"]);
         if command == "exit" {
             return;
+        } else if command == "pwd" {
+            let cwd = env::current_dir().unwrap();
+            println!("{}", cwd.display());
         } else if let Some(echo) = command.strip_prefix("echo ") {
             println!("{}", echo);
         } else if let Some(type_cmd) = command.strip_prefix("type ") {
