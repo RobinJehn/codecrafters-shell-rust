@@ -82,7 +82,7 @@ fn parse_input(input: &str) -> Vec<String> {
                 _ => {
                     prev_esc_char_state = state;
                     state = ParseState::AfterEscapeChar;
-                    // token.push(c);
+                    token.push(c);
                 }
             },
             '\"' => match state {
@@ -109,7 +109,14 @@ fn parse_input(input: &str) -> Vec<String> {
                     }
                 }
             },
-            _ => token.push(c),
+            _ => match state {
+                ParseState::AfterEscapeChar => {
+                    token.push('\\');
+                    token.push(c);
+                    state = prev_esc_char_state;
+                }
+                _ => token.push(c),
+            },
         }
     }
 
