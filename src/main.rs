@@ -128,10 +128,7 @@ fn parse_input(input: &str) -> Vec<String> {
             },
             _ => match state {
                 ParseState::AfterEscapeChar => {
-                    if (prev_esc_char_state == ParseState::InsideDoubleQuote
-                        && !['$', 'n'].contains(&c))
-                        || prev_esc_char_state == ParseState::InsideSingleQuote
-                    {
+                    if prev_esc_char_state == ParseState::InsideSingleQuote {
                         token.push('\\');
                     }
                     token.push(c);
